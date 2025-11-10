@@ -246,21 +246,27 @@ def load_config(config_file):
     
     return paths, integration, advanced
 
+def run_batch_integration(
+    poni_file,
+    mask_file,
+    input_pattern,
+    output_dir,
+    dataset_path=None,
+    npt=2000,
+    unit='2th_deg'
+):
+    """
+    Run batch 1D integration using pyFAI
 
-def main():
-    """Main function: hardcoded version"""
-    print("="*60)
-    print("HDF5 Diffraction Image Batch Integration Script (Hardcoded Version)")
-    print("="*60)
-
-    poni_file = r'D:\HEPS\ID31\test\using.poni'
-    mask_file = r'D:\HEPS\ID31\test\use.edf'
-    input_pattern = r'D:\HEPS\ID31\test\1\*.h5'
-    output_dir = r'D:\HEPS\ID31\test\out_dir'
-    dataset_path = None  # Fill in if known, like 'entry/data/data', otherwise None for auto-search
-
-    npt = 2000
-    unit = '2th_deg'
+    Args:
+        poni_file (str): Path to .poni calibration file
+        mask_file (str): Path to mask file (can be None)
+        input_pattern (str): Glob pattern to input HDF5 files
+        output_dir (str): Output directory
+        dataset_path (str, optional): HDF5 dataset path (autodetect if None)
+        npt (int): Number of integration points
+        unit (str): Output unit (e.g. '2th_deg', 'q_A^-1', etc.)
+    """
 
     integration_kwargs = {
         'correctSolidAngle': True,
@@ -271,8 +277,7 @@ def main():
     }
 
     if not os.path.exists(poni_file):
-        print(f"✗ Error: Calibration file not found {poni_file}")
-        sys.exit(1)
+        raise FileNotFoundError(f"Calibration file not found: {poni_file}")
 
     integrator = BatchIntegrator(poni_file, mask_file)
 
@@ -283,6 +288,21 @@ def main():
         unit=unit,
         dataset_path=dataset_path,
         **integration_kwargs
+    )
+def main():
+    """Main function: hardcoded version"""
+    print("=" * 60)
+    print("HDF5 Diffraction Image Batch Integration Script (Hardcoded Version)")
+    print("=" * 60)
+
+    run_batch_integration(
+        poni_file=r'D:\HEPS\ID31\test\using.poni',
+        mask_file=r'D:\HEPS\ID31\test\use.edf',
+        input_pattern=r'D:\HEPS\ID31\test\input_dir\*.h5',
+        output_dir=r'D:\HEPS\ID31\test\out_dir',
+        dataset_path=None,
+        npt=2000,
+        unit='2th_deg'
     )
 
 
